@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 
-from flask import Flask, redirect, send_from_directory
+from flask import Flask, send_from_directory
 from flask import render_template
-from yeelight import Bulb, LightType, discover_bulbs
+from yeelight import Bulb, LightType
 
 app = Flask(__name__, template_folder="./template/")
 bulb = Bulb("192.168.0.111", auto_on=True)
+bulb_hex_rgb = "FFFFFF"
 bulb_brightness = 100
 bulb_color_temp = 5600
 desk_lamp = Bulb("192.168.0.108", auto_on=True)
 desk_lamp_brightness = 100
 desk_lamp_color_temp = 5600
+desk_lamp_background_hex_rgb = "FFFFFF"
 desk_lamp_background_brightness = 100
 desk_lamp_background_color_temp = 5600
 
@@ -31,7 +33,11 @@ def bulb_update_plain_params(blb, brightness, color_temp, light_type=LightType.M
 
 @app.route('/')
 def http_main_entry():
-    return render_template('index.html') # , mode=current_mode)
+    return render_template('index.html', bulb_brightness=bulb_brightness, bulb_color_temp=bulb_color_temp,
+                           desk_lamp_brightness=desk_lamp_brightness, desk_lamp_color_temp=desk_lamp_color_temp,
+                           desk_lamp_background_brightness=desk_lamp_background_brightness,
+                           desk_lamp_background_color_temp=desk_lamp_background_color_temp,
+                           bulb_hex_rgb=bulb_hex_rgb, desk_lamp_background_hex_rgb=desk_lamp_background_hex_rgb)
 
 
 @app.route('/colour/<dev>/<r>/<g>/<b>')
@@ -40,8 +46,12 @@ def change_colour(dev, r, g, b):
     g = int(g)
     b = int(b)
     if dev == "bulb":
+        global bulb_hex_rgb
+        bulb_hex_rgb = '%02x%02x%02x' % (r, g, b)
         bulb.set_rgb(r, g, b)
     elif dev == "desk_lamp_background":
+        global desk_lamp_background_hex_rgb
+        desk_lamp_background_hex_rgb = '%02x%02x%02x' % (r, g, b)
         desk_lamp.set_rgb(r, g, b, light_type=LightType.Ambient)
     print("changed", dev, "colour to", r, g, b)
     return "ok"
@@ -74,7 +84,8 @@ def change_brightness(dev, value):
     elif dev == "desk_lamp_background":
         global desk_lamp_background_brightness, desk_lamp_background_color_temp
         desk_lamp_background_brightness = value
-        bulb_update_plain_params(desk_lamp, desk_lamp_background_brightness, desk_lamp_background_color_temp, light_type=LightType.Ambient)
+        bulb_update_plain_params(desk_lamp, desk_lamp_background_brightness, desk_lamp_background_color_temp,
+                                 light_type=LightType.Ambient)
     print("changed", dev, "brightness to", value)
     return "ok"
 
@@ -93,7 +104,8 @@ def change_colour_temp(dev, value):
     elif dev == "desk_lamp_background":
         global desk_lamp_background_brightness, desk_lamp_background_color_temp
         desk_lamp_background_color_temp = value
-        bulb_update_plain_params(desk_lamp, desk_lamp_background_brightness, desk_lamp_background_color_temp, light_type=LightType.Ambient)
+        bulb_update_plain_params(desk_lamp, desk_lamp_background_brightness, desk_lamp_background_color_temp,
+                                 light_type=LightType.Ambient)
     print("changed", dev, "colour temp to", value)
     return "ok"
 
@@ -104,5 +116,5 @@ def send_js(path):
 
 
 if __name__ == '__main__':
-    #i = discover_bulbs()
+    # i = discover_bulbs()
     app.run(host='0.0.0.0', port=8139, threaded=True)

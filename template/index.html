@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Xiaomi Lights Server}</title>
+    <title>Xiaomi Lights Server</title>
     <script src="/js/jscolor.js"></script>
     <script src="/js/script.js"></script>
 </head>
@@ -12,64 +12,67 @@
 <div id="bulb">
     <h2>Bulb</h2>
     <div class="onoff">
-        <button onclick="switchState('bulb', 'on')">Turn on</button>
-        <button onclick="switchState('bulb', 'off')">Turn off</button>
+        <input type="button" onclick="switchState('bulb', 'on')" value="On">
+        <input type="button" onclick="switchState('bulb', 'off')" value="Off">
     </div>
     <div class="coloradj">
         Color:
-        <input id="jsc-bulb" class="jscolor {onFineChange:'updateRect(this)'}" value="FFFFFF">
-        <button onclick="updateRGB('bulb', 'jsc-bulb')">Apply</button>
+        <input id="jsc-bulb" class="jscolor {onFineChange:'updateRect(this)'}" value="{{ bulb_hex_rgb }}">
+        <input type="button" onclick="updateRGB('bulb', 'jsc-bulb')" value="Set">
     </div>
     <div class="brightadj">
         Brightness:
-        <input type="range" id="rng-brt-bulb" min="0" max="100" step="25" value="100">
-        <button onclick="updateBrightness('bulb', 'rng-brt-bulb')">Apply</button>
+        <input type="range" id="rng-brt-bulb" min="0" max="100" step="25" value="{{ bulb_brightness }}">
+        <input type="button" onclick="updateBrightness('bulb', 'rng-brt-bulb')" value="Set">
     </div>
     <div class="ctadj">
         Color Temp:
-        <input type="range" id="rng-ct-bulb" min="2700" max="6500" step="100" value="5600">
-        <button onclick="updateColorTemp('bulb', 'rng-ct-bulb')">Apply</button>
+        <input type="range" id="rng-ct-bulb" min="2700" max="6500" step="100" value="{{ bulb_color_temp }}">
+        <input type="button" onclick="updateColorTemp('bulb', 'rng-ct-bulb')" value="Set">
     </div>
 </div>
 <hline></hline>
 <div id="desk_lamp">
     <h2>Desk Lamp</h2>
     <div class="onoff">
-        <button onclick="switchState('desk_lamp', 'on')">Turn on</button>
-        <button onclick="switchState('desk_lamp', 'off')">Turn off</button>
+        <input type="button" onclick="switchState('desk_lamp', 'on')" value="On">
+        <input type="button" onclick="switchState('desk_lamp', 'off')" value="Off">
     </div>
     <div class="brightadj">
         Brightness:
-        <input type="range" id="rng-brt-desk_lamp" min="0" max="100" step="25" value="100">
-        <button onclick="updateBrightness('desk_lamp', 'rng-brt-desk_lamp')">Apply</button>
+        <input type="range" id="rng-brt-desk_lamp" min="0" max="100" step="25" value="{{ desk_lamp_brightness }}">
+        <input type="button" onclick="updateBrightness('desk_lamp', 'rng-brt-desk_lamp')" value="Set">
     </div>
     <div class="ctadj">
         Color Temp:
-        <input type="range" id="rng-ct-desk_lamp" min="2700" max="6500" step="100" value="5600">
-        <button onclick="updateColorTemp('desk_lamp', 'rng-ct-desk_lamp')">Apply</button>
+        <input type="range" id="rng-ct-desk_lamp" min="2700" max="6500" step="100" value="{{ desk_lamp_color_temp }}">
+        <input type="button" onclick="updateColorTemp('desk_lamp', 'rng-ct-desk_lamp')" value="Set">
     </div>
 </div>
 <hline></hline>
 <div id="desk_lamp_background">
     <h2>Desk Lamp (Background)</h2>
-       <div class="onoff">
-        <button onclick="switchState('desk_lamp_background', 'on')">Turn on</button>
-        <button onclick="switchState('desk_lamp_background', 'off')">Turn off</button>
+    <div class="onoff">
+        <input type="button" onclick="switchState('desk_lamp_background', 'on')" value="On">
+        <input type="button" onclick="switchState('desk_lamp_background', 'off')" value="Off">
     </div>
     <div class="coloradj">
         Color:
-        <input id="jsc-dlamp" class="jscolor {onFineChange:'updateRect(this)'}" value="FFFFFF">
-        <button onclick="updateRGB('desk_lamp_background', 'jsc-dlamp')">Apply</button>
+        <input id="jsc-dlamp" class="jscolor {onFineChange:'updateRect(this)'}"
+               value="{{ desk_lamp_background_hex_rgb }}">
+        <input type="button" onclick="updateRGB('desk_lamp_background', 'jsc-dlamp')" value="Set">
     </div>
     <div class="brightadj">
         Brightness:
-        <input type="range" id="rng-brt-desk_lamp_bg" min="0" max="100" step="25" value="100">
-        <button onclick="updateBrightness('desk_lamp_background', 'rng-brt-desk_lamp_bg')">Apply</button>
+        <input type="range" id="rng-brt-desk_lamp_bg" min="0" max="100" step="25"
+               value="{{ desk_lamp_background_brightness }}">
+        <input type="button" onclick="updateBrightness('desk_lamp_background', 'rng-brt-desk_lamp_bg')" value="Set">
     </div>
     <div class="ctadj">
         Color Temp:
-        <input type="range" id="rng-ct-desk_lamp_bg" min="2700" max="6500" step="100" value="5600">
-        <button onclick="updateColorTemp('desk_lamp_background', 'rng-ct-desk_lamp_bg')">Apply</button>
+        <input type="range" id="rng-ct-desk_lamp_bg" min="2700" max="6500" step="100"
+               value="{{ desk_lamp_background_color_temp }}">
+        <input type="button" onclick="updateColorTemp('desk_lamp_background', 'rng-ct-desk_lamp_bg')" value="Set">
     </div>
 </div>
 </p>
