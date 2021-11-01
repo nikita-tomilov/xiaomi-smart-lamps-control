@@ -2,112 +2,81 @@
 
 from flask import Flask, send_from_directory
 from flask import render_template
-from yeelight import Bulb, LightType
+from yeelight import LightType
+
+from light_device import LightDevice
 
 app = Flask(__name__, template_folder="./template/")
-bulb = Bulb("192.168.0.111", auto_on=True)
-bulb_hex_rgb = "FFFFFF"
-bulb_brightness = 100
-bulb_color_temp = 5600
-desk_lamp = Bulb("192.168.0.108", auto_on=True)
-desk_lamp_brightness = 100
-desk_lamp_color_temp = 5600
-desk_lamp_background_hex_rgb = "FFFFFF"
-desk_lamp_background_brightness = 100
-desk_lamp_background_color_temp = 5600
 
-
-def bulb_toggle(blb, state, light_type=LightType.Main):
-    if state == "on":
-        blb.turn_on(light_type)
-    elif state == "off":
-        blb.turn_off(light_type)
-    if state == "toggle":
-        blb.toggle(light_type)
-
-
-def bulb_update_plain_params(blb, brightness, color_temp, light_type=LightType.Main):
-    blb.set_color_temp(color_temp, light_type)
-    blb.set_brightness(brightness, light_type)
+devices = {
+    'bulb': LightDevice(identifier="bulb", name="Bulb", ip="192.168.0.111", supports_rgb=True, supports_white=True,
+                        brightness=100, wb=5600),
+    'desk_lamp': LightDevice(identifier="desk_lamp", name="Desk Lamp", ip="192.168.0.108", supports_rgb=False,
+                             supports_white=True, brightness=100, wb=5600),
+    'desk_lamp_bg': LightDevice(identifier="desk_lamp_bg", name="Desk Lamp (Background)", ip="192.168.0.108",
+                                supports_rgb=True, supports_white=True, light_type=LightType.Ambient)
+}
 
 
 @app.route('/')
 def http_main_entry():
-    return render_template('index.html', bulb_brightness=bulb_brightness, bulb_color_temp=bulb_color_temp,
-                           desk_lamp_brightness=desk_lamp_brightness, desk_lamp_color_temp=desk_lamp_color_temp,
-                           desk_lamp_background_brightness=desk_lamp_background_brightness,
-                           desk_lamp_background_color_temp=desk_lamp_background_color_temp,
-                           bulb_hex_rgb=bulb_hex_rgb, desk_lamp_background_hex_rgb=desk_lamp_background_hex_rgb)
+    return render_template('index.html', devices=list(devices.values()))
 
 
-@app.route('/colour/<dev>/<r>/<g>/<b>')
-def change_colour(dev, r, g, b):
+@app.route('/colour/<dev_id>/<r>/<g>/<b>')
+def change_colour(dev_id, r, g, b):
     r = int(r)
     g = int(g)
     b = int(b)
-    if dev == "bulb":
-        global bulb_hex_rgb
-        bulb_hex_rgb = '%02x%02x%02x' % (r, g, b)
-        bulb.set_rgb(r, g, b)
-    elif dev == "desk_lamp_background":
-        global desk_lamp_background_hex_rgb
-        desk_lamp_background_hex_rgb = '%02x%02x%02x' % (r, g, b)
-        desk_lamp.set_rgb(r, g, b, light_type=LightType.Ambient)
-    print("changed", dev, "colour to", r, g, b)
-    return "ok"
+    if dev_id in devices:
+        device = devices[dev_id]
+        device.r = r
+        device.g = g
+        device.b = b
+        device.apply_rgb()
+        print("changed", dev_id, "colour to", r, g, b)
+        return "ok"
+    else:
+        return "no dev " + dev_id + "found"
 
 
-@app.route('/switch/<dev>/<state>')
-def switch(dev, state):
-    if dev == "bulb":
-        bulb_toggle(bulb, state)
-    elif dev == "desk_lamp":
-        bulb_toggle(desk_lamp, state)
-    elif dev == "desk_lamp_background":
-        bulb_toggle(desk_lamp, state, light_type=LightType.Ambient)
-    print("switched", dev, "to", state)
-    return "ok"
+@app.route('/switch/<dev_id>/<state>')
+def switch(dev_id, state):
+    if dev_id in devices:
+        device = devices[dev_id]
+        device.switch(state)
+        print("switched", dev_id, "to state", state)
+        return "ok"
+    else:
+        return "no dev " + dev_id + "found"
 
 
-@app.route('/brightness/<dev>/<value>')
-def change_brightness(dev, value):
+# noinspection DuplicatedCode
+@app.route('/brightness/<dev_id>/<value>')
+def change_brightness(dev_id, value):
     value = int(value)
-    global bulb_brightness, bulb_color_temp, desk_lamp_brightness, desk_lamp_color_temp
-    if dev == "bulb":
-        global bulb_brightness, bulb_color_temp
-        bulb_brightness = value
-        bulb_update_plain_params(bulb, bulb_brightness, bulb_color_temp)
-    elif dev == "desk_lamp":
-        global desk_lamp_brightness, desk_lamp_color_temp
-        desk_lamp_brightness = value
-        bulb_update_plain_params(desk_lamp, desk_lamp_brightness, desk_lamp_color_temp)
-    elif dev == "desk_lamp_background":
-        global desk_lamp_background_brightness, desk_lamp_background_color_temp
-        desk_lamp_background_brightness = value
-        bulb_update_plain_params(desk_lamp, desk_lamp_background_brightness, desk_lamp_background_color_temp,
-                                 light_type=LightType.Ambient)
-    print("changed", dev, "brightness to", value)
-    return "ok"
+    if dev_id in devices:
+        device = devices[dev_id]
+        device.brightness = value
+        device.apply_white()
+        print("switched", dev_id, "brightness to", value)
+        return "ok"
+    else:
+        return "no dev " + dev_id + "found"
 
 
-@app.route('/ct/<dev>/<value>')
-def change_colour_temp(dev, value):
+# noinspection DuplicatedCode
+@app.route('/wb/<dev_id>/<value>')
+def change_white_balance(dev_id, value):
     value = int(value)
-    if dev == "bulb":
-        global bulb_brightness, bulb_color_temp
-        bulb_color_temp = value
-        bulb_update_plain_params(bulb, bulb_brightness, bulb_color_temp)
-    elif dev == "desk_lamp":
-        global desk_lamp_brightness, desk_lamp_color_temp
-        desk_lamp_color_temp = value
-        bulb_update_plain_params(desk_lamp, desk_lamp_brightness, desk_lamp_color_temp)
-    elif dev == "desk_lamp_background":
-        global desk_lamp_background_brightness, desk_lamp_background_color_temp
-        desk_lamp_background_color_temp = value
-        bulb_update_plain_params(desk_lamp, desk_lamp_background_brightness, desk_lamp_background_color_temp,
-                                 light_type=LightType.Ambient)
-    print("changed", dev, "colour temp to", value)
-    return "ok"
+    if dev_id in devices:
+        device = devices[dev_id]
+        device.wb = value
+        device.apply_white()
+        print("switched", dev_id, "brightness to", value)
+        return "ok"
+    else:
+        return "no dev " + dev_id + "found"
 
 
 @app.route('/js/<path:path>')
@@ -117,4 +86,5 @@ def send_js(path):
 
 if __name__ == '__main__':
     # i = discover_bulbs()
+    # k = devices['bulb'].get_props()
     app.run(host='0.0.0.0', port=8139, threaded=True)

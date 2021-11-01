@@ -12,9 +12,9 @@ function updateBrightness(dev_id, input_id) {
     httpGetAsync2(global_url + "brightness/" + dev_id + "/" + brightness);
 }
 
-function updateColorTemp(dev_id, input_id) {
+function updateWB(dev_id, input_id) {
     const brightness = document.getElementById(input_id).value;
-    httpGetAsync2(global_url + "ct/" + dev_id + "/" + brightness);
+    httpGetAsync2(global_url + "wb/" + dev_id + "/" + brightness);
 }
 
 function switchState(dev_id, state) {
