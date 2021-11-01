@@ -1,6 +1,17 @@
 from yeelight import LightType, Bulb
 
 
+def get_rgb_from_int(intstr):
+    hexstr = "%06x" % intstr
+    hexr = hexstr[0] + hexstr[1]
+    hexg = hexstr[2] + hexstr[3]
+    hexb = hexstr[4] + hexstr[5]
+    r = int(hexr, 16)
+    g = int(hexg, 16)
+    b = int(hexb, 16)
+    return r, g, b
+
+
 class LightDevice:
 
     def __init__(self, identifier, name, ip, supports_rgb=False, r=0, g=255, b=0, supports_white=False, brightness=0,
@@ -48,6 +59,22 @@ class LightDevice:
     def get_hex_rgb(self):
         return '%02x%02x%02x' % (self.r, self.g, self.b)
 
-    def get_props(self):
-        i = self.lamp.get_properties()
-        return 1
+    def update(self):
+        props = self.lamp.get_properties()
+        print("Props for ", self.identifier)
+        for k, v in props.items():
+            print("  ", k, v)
+        if self.light_type == LightType.Main:
+            self.brightness = int(props['bright'])
+            self.wb = int(props['ct'])
+            r, g, b = get_rgb_from_int(int(props['rgb']))
+            self.r = r
+            self.g = g
+            self.b = b
+        else:
+            self.brightness = int(props['bg_bright'])
+            self.wb = int(props['bg_ct'])
+            r, g, b = get_rgb_from_int(int(props['bg_rgb']))
+            self.r = r
+            self.g = g
+            self.b = b

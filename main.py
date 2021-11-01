@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import threading
+import time
 
 from flask import Flask, send_from_directory
 from flask import render_template
@@ -84,7 +86,15 @@ def send_js(path):
     return send_from_directory('template', path)
 
 
+def device_info_updater():
+    while True:
+        for device in list(devices.values()):
+            device.update()
+        time.sleep(2000)
+
+
 if __name__ == '__main__':
-    # i = discover_bulbs()
-    # k = devices['bulb'].get_props()
+    updater_thread = threading.Thread(target=device_info_updater)
+    updater_thread.daemon = True
+    updater_thread.start()
     app.run(host='0.0.0.0', port=8139, threaded=True)
