@@ -21,6 +21,10 @@ function switchState(dev_id, state) {
     httpGetAsync2(global_url + "switch/" + dev_id + "/" + state);
 }
 
+function switchFlow(dev_id, flow) {
+    httpGetAsync2(global_url + "flow/" + dev_id + "/" + flow);
+}
+
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {

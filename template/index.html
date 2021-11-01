@@ -25,6 +25,10 @@
         <input id="jsc-{{ device.identifier }}" class="jscolor {onFineChange:'updateRect(this)'}"
                value="{{ device.get_hex_rgb() }}">
         <input type="button" onclick="updateRGB('{{ device.identifier }}', 'jsc-{{ device.identifier }}')" value="Set">
+        <br>
+        {% for flow_preset in flow_presets %}
+        <input type="button" onclick="switchFlow('{{ device.identifier }}', '{{ flow_preset }}')" value="{{ flow_preset }}">
+        {% endfor %}
     </div>
     <br>
     {% endif %}

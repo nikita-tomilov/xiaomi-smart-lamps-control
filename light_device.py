@@ -14,7 +14,9 @@ def get_rgb_from_int(intstr):
     return r, g, b
 
 
-def get_mode_str_from_int(intmode):
+def get_mode_str_from_int(intmode, flowing):
+    if flowing == 1:
+        return "flow enabled"
     if intmode == 1:
         return "rgb"
     elif intmode == 2:
@@ -78,13 +80,18 @@ class LightDevice:
     def get_hex_rgb(self):
         return '%02x%02x%02x' % (self.r, self.g, self.b)
 
+    def go_flow(self, flow):
+        if self.supports_rgb:
+            with self.lock:
+                self.lamp.start_flow(flow)
+
     def update(self):
         with self.lock:
             if self.light_type == LightType.Main:
                 props = self.lamp.get_properties()
                 LightDevice.props_cache[self.ip] = props
                 # print("Props for ", self.identifier)
-                self.mode = get_mode_str_from_int(int(props['color_mode']))
+                self.mode = get_mode_str_from_int(int(props['color_mode']), int(props['flowing']))
                 # for k, v in props.items():
                 #     print("  ", k, v)
                 self.brightness = int(props['bright'])

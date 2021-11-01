@@ -4,7 +4,7 @@ import time
 
 from flask import Flask, send_from_directory
 from flask import render_template
-from yeelight import LightType
+from yeelight import LightType, flows
 
 from light_device import LightDevice
 
@@ -32,11 +32,36 @@ light_presets = [
     10, 25, 50, 75, 100
 ]
 
+flow_presets = {
+    'alarm': flows.alarm(),
+    'candle_flicker': flows.candle_flicker(),
+    'christmas': flows.christmas(),
+    'date_night': flows.date_night(),
+    'disco': flows.disco(),
+    'happy_birthday': flows.happy_birthday(),
+    'home': flows.home(),
+    'lsd': flows.lsd(),
+    'movie': flows.movie(),
+    'night_mode': flows.night_mode(),
+    'police': flows.police(),
+    'police2': flows.police2(),
+    'pulse': flows.pulse(255, 255, 255),
+    'random_loop': flows.random_loop(),
+    'rgb': flows.rgb(),
+    'romance': flows.romance(),
+    'slowdown': flows.slowdown(),
+    'strobe': flows.strobe(),
+    'strobe_color': flows.strobe_color(),
+    'sunrise': flows.sunrise(),
+    'sunset': flows.sunset(),
+    'temp': flows.temp()
+}
+
 
 @app.route('/')
 def http_main_entry():
     return render_template('index.html', devices=list(devices.values()), wb_swatches=wb_swatches,
-                           light_presets=light_presets)
+                           light_presets=light_presets, flow_presets=list(flow_presets.keys()))
 
 
 @app.route('/colour/<dev_id>/<r>/<g>/<b>')
@@ -63,6 +88,19 @@ def switch(dev_id, state):
         device.switch(state)
         print("switched", dev_id, "to state", state)
         return "ok"
+    else:
+        return "no dev " + dev_id + "found"
+
+
+@app.route('/flow/<dev_id>/<flow_name>')
+def flow(dev_id, flow_name):
+    if dev_id in devices:
+        if flow_name in flow_presets:
+            device = devices[dev_id]
+            flow_preset = flow_presets[flow_name]
+            device.go_flow(flow_preset)
+            print("switched", dev_id, "to flow", flow_name)
+            return "ok"
     else:
         return "no dev " + dev_id + "found"
 
