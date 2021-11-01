@@ -150,6 +150,7 @@ def device_info_updater():
 
 
 if __name__ == '__main__':
+    devices['desk_lamp_bg'].lamp = devices['desk_lamp'].lamp
     updater_thread = threading.Thread(target=device_info_updater)
     updater_thread.daemon = True
     updater_thread.start()

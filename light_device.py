@@ -42,7 +42,8 @@ class LightDevice:
         self.brightness = brightness
         self.wb = wb
         self.light_type = light_type
-        self.lamp = Bulb(ip, auto_on=True)
+        if light_type == LightType.Main:
+            self.lamp = Bulb(ip, auto_on=True)
         self.mode = "not known yet"
         self.lock = threading.Lock()
 
@@ -83,17 +84,14 @@ class LightDevice:
     def go_flow(self, flow):
         if self.supports_rgb:
             with self.lock:
-                self.lamp.start_flow(flow)
+                self.lamp.start_flow(flow, light_type=self.light_type)
 
     def update(self):
         with self.lock:
             if self.light_type == LightType.Main:
                 props = self.lamp.get_properties()
                 LightDevice.props_cache[self.ip] = props
-                # print("Props for ", self.identifier)
                 self.mode = get_mode_str_from_int(int(props['color_mode']), int(props['flowing']))
-                # for k, v in props.items():
-                #     print("  ", k, v)
                 self.brightness = int(props['bright'])
                 self.wb = int(props['ct'])
                 r, g, b = get_rgb_from_int(int(props['rgb']))
@@ -109,4 +107,4 @@ class LightDevice:
                 self.r = r
                 self.g = g
                 self.b = b
-                self.mode = "n/a"
+                self.mode = get_mode_str_from_int(int(props['color_mode']), int(props['flowing']))
