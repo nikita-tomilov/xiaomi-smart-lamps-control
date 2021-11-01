@@ -104,8 +104,8 @@ def device_info_updater():
     while True:
         for device in list(devices.values()):
             device.update()
-            time.sleep(1000)
-        time.sleep(2000)
+            time.sleep(1)
+        time.sleep(2)
 
 
 if __name__ == '__main__':
