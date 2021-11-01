@@ -12,28 +12,51 @@
 {% for device in devices %}
 <div class="device">
     <h2>{{ device.name }}</h2>
+    Mode: {{ device.mode }}
+    <br>
     <div class="onoff">
         <input type="button" onclick="switchState('{{ device.identifier }}', 'on')" value="On">
         <input type="button" onclick="switchState('{{ device.identifier }}', 'off')" value="Off">
     </div>
+    <br>
     {% if device.supports_rgb %}
-     <div class="coloradj">
+    <div class="coloradj">
         Color:
-        <input id="jsc-{{ device.identifier }}" class="jscolor {onFineChange:'updateRect(this)'}" value="{{ device.get_hex_rgb() }}">
+        <input id="jsc-{{ device.identifier }}" class="jscolor {onFineChange:'updateRect(this)'}"
+               value="{{ device.get_hex_rgb() }}">
         <input type="button" onclick="updateRGB('{{ device.identifier }}', 'jsc-{{ device.identifier }}')" value="Set">
     </div>
+    <br>
     {% endif %}
     {% if device.supports_white %}
-        <div class="brightadj">
+    <div class="brightadj">
         Brightness:
-        <input type="range" id="rng-brt-{{ device.identifier }}" min="0" max="100" step="25" value="{{ device.brightness }}">
-        <input type="button" onclick="updateBrightness('{{ device.identifier }}', 'rng-brt-{{ device.identifier }}')" value="Set">
+        <input type="range" id="rng-brt-{{ device.identifier }}" min="0" max="100" step="25"
+               value="{{ device.brightness }}">
+        <input type="button" id="apply-brt-{{ device.identifier }}"
+               onclick="updateBrightness('{{ device.identifier }}', 'rng-brt-{{ device.identifier }}')" value="Set">
+        <br>
+        {% for light_preset in light_presets %}
+        <input type="button"
+               onclick="document.getElementById('rng-brt-{{ device.identifier }}').value = {{ light_preset }}; document.getElementById('apply-brt-{{ device.identifier }}').click()"
+               value="{{ light_preset }}">
+        {% endfor %}
     </div>
+    <br>
     <div class="ctadj">
         Color Temp:
-        <input type="range" id="rng-ct-{{ device.identifier }}" min="2700" max="6500" step="100" value="{{ device.wb }}">
-        <input type="button" onclick="updateWB('{{ device.identifier }}', 'rng-ct-{{ device.identifier }}')" value="Set">
+        <input type="range" id="rng-ct-{{ device.identifier }}" min="2700" max="6500" step="100"
+               value="{{ device.wb }}">
+        <input type="button" id="apply-ct-{{ device.identifier }}"
+               onclick="updateWB('{{ device.identifier }}', 'rng-ct-{{ device.identifier }}')" value="Set">
+        <br>
+        {% for wb_swatch in wb_swatches %}
+        <input type="button"
+               onclick="document.getElementById('rng-ct-{{ device.identifier }}').value = {{ wb_swatch[0] }}; document.getElementById('apply-ct-{{ device.identifier }}').click()"
+               value="{{ wb_swatch[0] }}" style="background: {{ wb_swatch[1] }}">
+        {% endfor %}
     </div>
+    <br>
     {% endif %}
 </div>
 {% endfor %}

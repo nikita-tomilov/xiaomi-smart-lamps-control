@@ -12,6 +12,15 @@ def get_rgb_from_int(intstr):
     return r, g, b
 
 
+def get_mode_str_from_int(intmode):
+    if intmode == 1:
+        return "rgb"
+    elif intmode == 2:
+        return "white"
+    else:
+        return "unknown, code " + str(intmode)
+
+
 class LightDevice:
 
     def __init__(self, identifier, name, ip, supports_rgb=False, r=0, g=255, b=0, supports_white=False, brightness=0,
@@ -29,6 +38,7 @@ class LightDevice:
         self.wb = wb
         self.light_type = light_type
         self.lamp = Bulb(ip, auto_on=True)
+        self.mode = "not known yet"
 
     def turn_on(self):
         self.lamp.turn_on(light_type=self.light_type)
@@ -64,6 +74,7 @@ class LightDevice:
         print("Props for ", self.identifier)
         for k, v in props.items():
             print("  ", k, v)
+        self.mode = get_mode_str_from_int(int(props['color_mode']))
         if self.light_type == LightType.Main:
             self.brightness = int(props['bright'])
             self.wb = int(props['ct'])

@@ -19,10 +19,24 @@ devices = {
                                 supports_rgb=True, supports_white=True, light_type=LightType.Ambient)
 }
 
+wb_swatches = [
+    [2700, "#fddf83"],
+    [3500, "#fcf4d6"],
+    [4000, "#fffff7"],
+    [5000, "#ffffff"],
+    [5500, "#f2fdff"],
+    [6500, "#e6f8ff"],
+]
+
+light_presets = [
+    10, 25, 50, 75, 100
+]
+
 
 @app.route('/')
 def http_main_entry():
-    return render_template('index.html', devices=list(devices.values()))
+    return render_template('index.html', devices=list(devices.values()), wb_swatches=wb_swatches,
+                           light_presets=light_presets)
 
 
 @app.route('/colour/<dev_id>/<r>/<g>/<b>')
@@ -90,6 +104,7 @@ def device_info_updater():
     while True:
         for device in list(devices.values()):
             device.update()
+            time.sleep(1000)
         time.sleep(2000)
 
 
