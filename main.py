@@ -100,12 +100,15 @@ def send_js(path):
     return send_from_directory('template', path)
 
 
+# noinspection PyBroadException
 def device_info_updater():
     while True:
         for device in list(devices.values()):
-            device.update()
-            time.sleep(1)
-        time.sleep(2)
+            try:
+                device.update()
+            except Exception:
+                print("error in device_info_updater over device ", device.identifier)
+            time.sleep(2)
 
 
 if __name__ == '__main__':
