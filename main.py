@@ -7,6 +7,7 @@ from flask import render_template
 from yeelight import LightType, flows
 
 from light_device import LightDevice
+from socket_device import SocketDevice
 
 app = Flask(__name__, template_folder="./template/")
 
@@ -16,7 +17,9 @@ devices = {
     'desk_lamp': LightDevice(identifier="desk_lamp", name="Desk Lamp", ip="192.168.0.108", supports_rgb=False,
                              supports_white=True, brightness=100, wb=5600),
     'desk_lamp_bg': LightDevice(identifier="desk_lamp_bg", name="Desk Lamp (Background)", ip="192.168.0.108",
-                                supports_rgb=True, supports_white=True, light_type=LightType.Ambient)
+                                supports_rgb=True, supports_white=True, light_type=LightType.Ambient),
+    'socket': SocketDevice(identifier="socket", name="Socket", ip="192.168.0.172",
+                           token="827a5640037a78c26c2af4fd71d7aba5")
 }
 
 wb_swatches = [
